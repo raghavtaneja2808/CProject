@@ -1,0 +1,19 @@
+# Compiled programs and build artifacts
+/server
+/client
+*.exe
+*.o
+*.obj
+*.out
+
+# Attendance reports created while the server runs
+attendance_*.csv
+
+# Editor and IDE folders
+.vscode/
+.vs/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
