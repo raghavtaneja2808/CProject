@@ -1,11 +1,14 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include <CoreMediaIO/CMIOHardware.h>
 #define PORT 5050
 
+#ifdef __APPLE__
+// MAC: ask macOS if any camera is being used right now
+#include <CoreMediaIO/CMIOHardware.h>
 int camera_is_on() {
     CMIOObjectPropertyAddress all_cameras = {kCMIOHardwarePropertyDevices,
         kCMIOObjectPropertyScopeGlobal, kCMIOObjectPropertyElementMain};
@@ -25,6 +28,11 @@ int camera_is_on() {
     }
     return 0;
 }
+#else
+int camera_is_on() {
+    return system("fuser /dev/video* > /dev/null 2>&1") == 0;
+}
+#endif
 
 int main() {
     char ip[64], name[32];
@@ -34,7 +42,7 @@ int main() {
     printf("Teacher's IP (127.0.0.1 if same laptop): ");
     scanf("%63s", ip);
     printf("Your name: ");
-    scanf("%31s", name);
+    scanf(" %31[^\n]", name);   // read the whole line, spaces included
     printf("Roll number: ");
     scanf("%lld", &roll);
     printf("Join code: ");

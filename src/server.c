@@ -112,7 +112,7 @@ int main() {
 
             if (strncmp(buf, "HELLO", 5) == 0) {
                 int code;
-                sscanf(buf, "HELLO %d %lld %31s", &code, &students[i].roll, students[i].name);
+                sscanf(buf, "HELLO %d %lld %31[^\n]", &code, &students[i].roll, students[i].name);
                 if (code != join_code) {
                     say(students[i].sock, "DENIED Wrong join code\n");
                     students[i].roll = 0;
