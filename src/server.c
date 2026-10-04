@@ -14,7 +14,7 @@
 
 struct Student {
     int sock;                 // -1 means empty slot
-    int roll;                 // 0 means not joined yet
+    long long roll;           // 0 means not joined yet (long long: roll numbers are too big for int)
     char name[32];
     time_t camera_off_since;  // 0 means camera is on
     int warned;
@@ -29,9 +29,9 @@ void say(int sock, char *text) {
 
 void log_event(int i, char *what) {
     time_t now = time(NULL);
-    printf("Roll %d %s: %s\n", students[i].roll, students[i].name, what);
+    printf("Roll %lld %s: %s\n", students[i].roll, students[i].name, what);
     FILE *f = fopen("attendance.csv", "a");
-    fprintf(f, "%d,%s,%s,%s", students[i].roll, students[i].name, what, ctime(&now));
+    fprintf(f, "%lld,%s,%s,%s", students[i].roll, students[i].name, what, ctime(&now));
     fclose(f);
 }
 
@@ -112,7 +112,7 @@ int main() {
 
             if (strncmp(buf, "HELLO", 5) == 0) {
                 int code;
-                sscanf(buf, "HELLO %d %d %31s", &code, &students[i].roll, students[i].name);
+                sscanf(buf, "HELLO %d %lld %31s", &code, &students[i].roll, students[i].name);
                 if (code != join_code) {
                     say(students[i].sock, "DENIED Wrong join code\n");
                     students[i].roll = 0;
@@ -126,9 +126,12 @@ int main() {
                 int camera;
                 sscanf(buf, "BEAT %d", &camera);
                 if (camera == 1) {
+                    if (students[i].camera_off_since != 0)
+                        log_event(i, "camera ON");
                     students[i].camera_off_since = 0;
                     students[i].warned = 0;
                 } else if (students[i].camera_off_since == 0) {
+                    log_event(i, "camera OFF");
                     students[i].camera_off_since = time(NULL);
                 }
             }
@@ -144,7 +147,7 @@ int main() {
                 remove_student(i, "kicked: camera off");
             } else if (off >= WARN_AFTER && students[i].warned == 0) {
                 students[i].warned = 1;
-                printf("WARNING: Roll %d %s camera off for %ld sec\n", students[i].roll, students[i].name, off);
+                printf("WARNING: Roll %lld %s camera off for %ld sec\n", students[i].roll, students[i].name, off);
                 say(students[i].sock, "WARNING: Turn on your camera or you will be removed!\n");
             }
         }

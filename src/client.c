@@ -28,14 +28,15 @@ int camera_is_on() {
 
 int main() {
     char ip[64], name[32];
-    int roll, code;
+    long long roll;
+    int code;
 
     printf("Teacher's IP (127.0.0.1 if same laptop): ");
     scanf("%63s", ip);
     printf("Your name: ");
     scanf("%31s", name);
     printf("Roll number: ");
-    scanf("%d", &roll);
+    scanf("%lld", &roll);
     printf("Join code: ");
     scanf("%d", &code);
 
@@ -51,7 +52,7 @@ int main() {
     }
 
     char msg[100];
-    sprintf(msg, "HELLO %d %d %s\n", code, roll, name);
+    sprintf(msg, "HELLO %d %lld %s\n", code, roll, name);
     send(sock, msg, strlen(msg), 0);
 
     while (1) {
